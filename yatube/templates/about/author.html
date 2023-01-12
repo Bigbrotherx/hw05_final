@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Об авторе проекта{% endblock %}
+{% load static %}
+{% block content %}
+<div class="row row-cols-1 row-cols-md-3">
+    <div class="card text-black bg-light mb-3" style="max-width: 540px;">
+        <div class="row no-gutters">
+            <div class="col-md-6">
+            <img img src="{% static '/img/about/author.png' %}" class="card-img p-3" alt="...">
+            </div>
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h5 class="card-title">Привет, я Андрей</h5>
+                    <p class="card-text">В данный момент являюсь главным и единственным разработчиком этой социальной сети</p>
+                    <a class="nav-link active" href="https://github.com/Bigbrotherx">Moй GitHub</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card text-black bg-light mb-3" style="max-width: 540px;">
+        <div class="row no-gutters">
+            <div class="col-md-6 ">
+                <img src="{% static '/img/about/stepan.png' %}" class="card-img p-3" alt="..." >
+            </div>
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h5 class="card-title">Кот Степан</h5>
+                    <p class="card-text">А это мой кот, он меня мотивирует, и очень помогает в обучении.</p>
+                    <p class="card-text"><small class="text-muted">Так он на меня смотрит когда я начинаю говнокодить.</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card text-black bg-light mb-3" style="max-width: 540px;">
+        <div class="row no-gutters">
+            <div class="col-md-6 ">
+                <img src="{% static '/img/about/qr_code.png' %}" class="card-img p-3" alt="..." >
+            </div>
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h5 class="card-title">Источник вдохновения</h5>
+                    <p class="card-text">По QR коду можно ознакомиться с референсом &#128513; </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card text-center bg-light">
+    <div class="card-body">
+        <h5 class="card-title">Обратная связь</h5>
+        <p class="card-text">Если хочешь нас поддержать жми скорее кнопку!</p>
+        <a href="{% url 'about:author' %}" class="btn btn-primary">Поддержать</a>
+    </div>
+</div>
+
+{% endblock %}
