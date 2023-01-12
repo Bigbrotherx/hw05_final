@@ -159,9 +159,9 @@ class StaticURLTests(TestCase):
             ),
         ]
         redirection_success = reverse(
-                'posts:profile',
-                kwargs={'username': StaticURLTests.author.username}
-            )
+            'posts:profile',
+            kwargs={'username': StaticURLTests.author.username}
+        )
         for testing_url in testing_urls:
             with self.subTest(testing_url=testing_url):
                 redirection_fail = (

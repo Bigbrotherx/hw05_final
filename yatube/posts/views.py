@@ -142,7 +142,7 @@ def follow_index(request):
     '''Страница избранных постов'''
     template = 'posts/follow.html'
     followed_authors = Follow.objects.filter(
-            user=request.user.id).values_list('author')
+        user=request.user.id).values_list('author')
     posts = Post.objects.filter(author__in=followed_authors)
     page_obj = add_paginator(request, posts)
     context = {
@@ -157,10 +157,7 @@ def profile_follow(request, username):
     user = get_object_or_404(User, id=request.user.id)
     author = get_object_or_404(User, username=username)
     if user.id != author.id:
-        Follow.objects.update_or_create(
-            user=user,
-            author=author
-        )
+        Follow.objects.update_or_create(user=user, author=author)
     cache.clear()
 
     return redirect('posts:profile', username=username)
@@ -171,10 +168,7 @@ def profile_unfollow(request, username):
     '''Отписка от автора'''
     user = get_object_or_404(User, id=request.user.id)
     author = get_object_or_404(User, username=username)
-    Follow.objects.filter(
-            user=user,
-            author=author
-        ).delete()
+    Follow.objects.filter(user=user, author=author).delete()
     cache.clear()
 
     return redirect('posts:profile', username=username)
