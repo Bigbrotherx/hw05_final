@@ -134,9 +134,15 @@ class StaticURLTests(TestCase):
 
     def test_post_comment_avalible_for_authorized(self):
         '''Только авторизованный пользователь может коментировать пост'''
-        testing_url = f'/posts/{StaticURLTests.post.id}/comment/'
-        redirection_success = f'/posts/{StaticURLTests.post.id}/'
-        redirection_fail = f'/auth/login/?next={testing_url}'
+        testing_url = reverse(
+            'posts:add_comment',
+            kwargs={'post_id': StaticURLTests.post.id},
+        )
+        redirection_success = reverse(
+            'posts:post_detail',
+            kwargs={'post_id': StaticURLTests.post.id},
+        )
+        redirection_fail = reverse('users:login') + '?next=' + testing_url
         self.assertRedirects(
             self.authorized_client.get(testing_url),
             redirection_success

@@ -39,7 +39,7 @@ class Post(CreatedModel):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='group',
+        related_name='posts',
         verbose_name='группа',
         help_text='Группа, к которой будет относиться пост'
     )
@@ -112,6 +112,10 @@ class Follow(CreatedModel):
     )
 
     class Meta:
+        models.UniqueConstraint(
+            fields=['user', 'author'],
+            name='unique_following'
+        )
         verbose_name = 'подписка'
         verbose_name_plural = 'подписки'
 

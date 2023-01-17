@@ -22,16 +22,15 @@ class PostModelTest(TestCase):
         )
 
     def test_model_post_have_correct_object_name(self):
-        """Проверяем, что у модели Post корректно работает __str__."""
-        expected_object_name = (
-            PostModelTest.post.text[:MetaSet.MAX_CHARS_IN_TEXT_STR]
-        )
-        self.assertEqual(expected_object_name, str(self.post))
-
-    def test_model_group_have_correct_object_name(self):
-        """Проверяем, что у модели Group корректно работает __str__."""
-        expected_object_name = PostModelTest.group.title
-        self.assertEqual(expected_object_name, str(self.group))
+        """Проверяем, что у моделей корректно работает __str__."""
+        expected_real_str = {
+            PostModelTest.post.text[
+                :MetaSet.MAX_CHARS_IN_TEXT_STR]: str(self.post),
+            PostModelTest.group.title: str(self.group),
+        }
+        for expected_name, object_string in expected_real_str.items():
+            with self.subTest(object_string=object_string):
+                self.assertEqual(expected_name, object_string)
 
     def test_verbose_name_post(self):
         """verbose_name в полях модели post совпадает с ожидаемым."""

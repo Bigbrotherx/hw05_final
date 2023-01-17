@@ -7,8 +7,8 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.core.cache import cache
 
-from ..models import Post, Group, Comment, User
-from ..forms import PostForm
+from ..models import Post, Group, Comment, Follow, User
+from ..forms import PostForm, CommentForm
 from ..constants import PageSet
 
 
@@ -59,6 +59,12 @@ class PostViewsTest(TestCase):
             ))
         ])
         cls.posts = Post.objects.all()
+        cls.post_with_comment = Post.objects.first()
+        cls.comment = Comment.objects.create(
+            post=cls.post_with_comment,
+            author=cls.follower,
+            text='Тестовый коммент',
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -71,6 +77,12 @@ class PostViewsTest(TestCase):
         self.authorized_author.force_login(PostViewsTest.user)
         self.follower = Client()
         self.follower.force_login(PostViewsTest.follower)
+        self.follower.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': PostViewsTest.user.username}
+            ),
+        )
         self.pages_with_paginator = [
             reverse('posts:index'),
             reverse('posts:group_list',
@@ -127,11 +139,12 @@ class PostViewsTest(TestCase):
 
     def test_profile_shows_correct_context(self):
         '''Проверка контекста страницы профиля'''
-        response = self.authorized_author.get(
+        response = self.follower.get(
             reverse('posts:profile',
                     kwargs={'username': PostViewsTest.user.username})
         )
         self.assertEqual(response.context['author'], PostViewsTest.user)
+        self.assertTrue(response.context['following'])
         self.check_post_context(response.context['page_obj'][0])
 
     def test_post_detail_context(self):
@@ -140,6 +153,11 @@ class PostViewsTest(TestCase):
             reverse('posts:post_detail',
                     kwargs={'post_id': PostViewsTest.posts[0].id}))
         self.check_post_context(response.context['post'])
+        self.assertIsInstance(response.context['form'], CommentForm)
+        self.assertEqual(
+            response.context['comments'][0],
+            PostViewsTest.comment
+        )
 
     def test_first_page_contains_correct_amount_of_records(self):
         '''Проверка корректное количество постов на первой странице'''
@@ -199,17 +217,6 @@ class PostViewsTest(TestCase):
                 ).context['page_obj'][0]
                 self.assertEqual(new_post, first_post_at_page)
 
-    def test_new_comment_at_post_detail_page(self):
-        '''Проверка новый коментарий появляется на странице поста'''
-        testing_url = f'/posts/{PostViewsTest.posts[0].id}/'
-        new_comment = Comment.objects.create(
-            text='Тестовый коментарий',
-            post=PostViewsTest.posts[0],
-            author=PostViewsTest.user,
-        )
-        responce = self.authorized_author.get(testing_url)
-        self.assertEqual(new_comment, responce.context['comments'].first())
-
     def test_cache_index(self):
         """Проверка хранения и очищения кэша для index."""
         response = self.authorized_author.get(reverse('posts:index'))
@@ -224,24 +231,55 @@ class PostViewsTest(TestCase):
         response_new = self.authorized_author.get(reverse('posts:index'))
         self.assertNotEqual(response_old.content, response_new.content)
 
-    def test_new_post_at_follow_page(self):
-        '''Проверка что новый пост появляется только у подписчиков'''
-        self.follower.get(
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': PostViewsTest.user.username}
-            ),
-        )
+    def test_new_post_at_follower_page(self):
+        '''Проверка что новый пост появляется у подписчиков'''
         new_post = Post.objects.create(
             text='Новый пост',
             group=PostViewsTest.group,
             author=PostViewsTest.user,
         )
-        follower_page = self.follower.get(
+        favorite_page = self.follower.get(
             reverse('posts:follow_index')
         )
-        not_follower_page = self.authorized_author.get(
+        self.assertEqual(new_post, favorite_page.context['page_obj'][0])
+
+    def test_new_post_at_not_a_follower_page(self):
+        '''Проверка что новый пост не появляется у тех кто не подписан'''
+        Post.objects.create(
+            text='Новый пост',
+            group=PostViewsTest.group,
+            author=PostViewsTest.user,
+        )
+        favorite_page = self.authorized_author.get(
             reverse('posts:follow_index')
         )
-        self.assertEqual(new_post, follower_page.context['page_obj'][0])
-        self.assertEqual(0, len(not_follower_page.context['page_obj']))
+        self.assertEqual(0, len(favorite_page.context['page_obj']))
+
+    def test_start_following(self):
+        '''Проверка возможности подписаться на автора'''
+        self.new_user = User.objects.create_user(username='new_follower')
+        self.new_follower = Client()
+        self.new_follower.force_login(self.new_user)
+        self.new_follower.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': PostViewsTest.user}
+            )
+        )
+        self.assertTrue(Follow.objects.filter(
+            author=PostViewsTest.user,
+            user=self.new_user
+        ).exists())
+
+    def test_stop_following(self):
+        '''Проверка возможности отписаться от автора'''
+        self.follower.get(
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': PostViewsTest.user}
+            )
+        )
+        self.assertFalse(Follow.objects.filter(
+            author=PostViewsTest.user,
+            user=PostViewsTest.follower
+        ).exists())
