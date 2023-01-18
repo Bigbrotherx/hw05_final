@@ -132,7 +132,7 @@ class CommentFormTest(TestCase):
     def setUpClass(cls):
         '''Фикстуры класса'''
         super().setUpClass()
-        cls.user = User.objects.create_user(username='author')
+        cls.author = User.objects.create_user(username='author')
         cls.byte_image = (
             b'\x47\x49\x46\x38\x39\x61\x02\x00'
             b'\x01\x00\x80\x00\x00\x00\x00\x00'
@@ -147,26 +147,24 @@ class CommentFormTest(TestCase):
             description='Тестовое описание',
         )
         cls.post = Post.objects.create(
-            author=cls.user,
+            author=cls.author,
             text='Тестовый пост',
         )
         cls.comment = Comment.objects.create(
             post=cls.post,
-            author=cls.user,
+            author=cls.author,
             text='Тестовый коммент'
         )
 
     def setUp(self):
         '''Фикстуры'''
         self.authorized_autor = Client()
-        self.authorized_autor.force_login(CommentFormTest.user)
+        self.authorized_autor.force_login(CommentFormTest.author)
 
     def test_leave_comment_under_post(self):
         '''Проверка формы написания коментария к посту'''
         all_comments_befor_creating = [
-            comment.id for comment in Comment.objects.filter(
-                post=CommentFormTest.post
-            )
+            comment.id for comment in Comment.objects.all()
         ]
         form_data = {
             'text': 'Новый коммент'
@@ -184,6 +182,8 @@ class CommentFormTest(TestCase):
         self.assertTrue(
             Comment.objects.filter(
                 text=form_data['text'],
+                post=CommentFormTest.post.id,
+                author=CommentFormTest.author
             ).exists()
         )
         self.assertRedirects(

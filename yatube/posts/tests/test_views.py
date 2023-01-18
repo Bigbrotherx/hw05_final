@@ -65,6 +65,10 @@ class PostViewsTest(TestCase):
             author=cls.follower,
             text='Тестовый коммент',
         )
+        Follow.objects.create(
+            user=cls.follower,
+            author=cls.user
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -77,12 +81,6 @@ class PostViewsTest(TestCase):
         self.authorized_author.force_login(PostViewsTest.user)
         self.follower = Client()
         self.follower.force_login(PostViewsTest.follower)
-        self.follower.get(
-            reverse(
-                'posts:profile_follow',
-                kwargs={'username': PostViewsTest.user.username}
-            ),
-        )
         self.pages_with_paginator = [
             reverse('posts:index'),
             reverse('posts:group_list',
@@ -260,11 +258,17 @@ class PostViewsTest(TestCase):
         self.new_user = User.objects.create_user(username='new_follower')
         self.new_follower = Client()
         self.new_follower.force_login(self.new_user)
+        self.follow_amout_before = Follow.objects.count()
         self.new_follower.get(
             reverse(
                 'posts:profile_follow',
                 kwargs={'username': PostViewsTest.user}
             )
+        )
+        self.follow_amout_after = Follow.objects.count()
+        self.assertEqual(
+            self.follow_amout_after - self.follow_amout_before,
+            1
         )
         self.assertTrue(Follow.objects.filter(
             author=PostViewsTest.user,
@@ -273,11 +277,17 @@ class PostViewsTest(TestCase):
 
     def test_stop_following(self):
         '''Проверка возможности отписаться от автора'''
+        self.follow_amout_before = Follow.objects.count()
         self.follower.get(
             reverse(
                 'posts:profile_unfollow',
                 kwargs={'username': PostViewsTest.user}
             )
+        )
+        self.follow_amout_after = Follow.objects.count()
+        self.assertEqual(
+            self.follow_amout_after - self.follow_amout_before,
+            -1
         )
         self.assertFalse(Follow.objects.filter(
             author=PostViewsTest.user,

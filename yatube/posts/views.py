@@ -60,16 +60,7 @@ def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post, id=post_id)
     comments = post.comments.select_related('post__group',)
-    form = CommentForm(
-        request.POST or None,
-    )
-    if request.POST:
-        new_comment = form.save(commit=False)
-        new_comment.post = post
-        new_comment.author = request.user
-        new_comment.save()
-
-        return redirect('posts:post_detail', post_id=post_id)
+    form = CommentForm(None)
     context = {
         'post': post,
         'form': form,
