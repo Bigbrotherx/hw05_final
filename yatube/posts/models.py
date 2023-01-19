@@ -112,7 +112,12 @@ class Follow(CreatedModel):
     )
 
     class Meta:
-        unique_together = ('user', 'author',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='unique_following',
+            )
+        ]
         verbose_name = 'подписка'
         verbose_name_plural = 'подписки'
 
@@ -120,4 +125,7 @@ class Follow(CreatedModel):
         '''Вывод текста коментария'''
 
         return (
-            self.user.get_username() + ' fllow: ' + self.author.get_username())
+            self.user.get_username()
+            + ' follow: '
+            + self.author.get_username()
+        )

@@ -42,8 +42,8 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = author.posts.select_related('group',)
     following = (
-        author.following.filter(user=request.user).exists()
-        if request.user.is_authenticated else False
+        request.user.is_authenticated
+        and author.following.filter(user=request.user).exists()
     )
     page_obj = add_paginator(request, posts)
     context = {
@@ -128,7 +128,7 @@ def add_comment(request, post_id):
 def follow_index(request):
     '''Страница избранных постов'''
     template = 'posts/follow.html'
-    posts = Post.objects.filter(author__following__user_id=request.user.id)
+    posts = Post.objects.filter(author__following__user=request.user)
     page_obj = add_paginator(request, posts)
     context = {
         'page_obj': page_obj,
