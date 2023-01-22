@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import UniqueConstraint
 from django.contrib.auth import get_user_model
 
 from .constants import MetaSet
@@ -113,7 +114,7 @@ class Follow(CreatedModel):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
+            UniqueConstraint(
                 fields=['user', 'author'],
                 name='unique_following',
             )
