@@ -1,17 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'musthead.html' %}
 
 {% block title %}
     Профайл пользователя {{ author.get_full_name }}
 {% endblock title %}
 
-{% block header %}
-<div class="mb-5">  
-    <h1>Все посты пользователя: {{ author.get_full_name }} </h1>
-    <h3>Всего постов: {{ author.posts.count }} </h3> 
-    <h4> Подписок: {{ author.follower.count }} </h4>
-    <h4> Подписчиков: {{ author.following.count }} </h4>
-    <hr>
-    {% if request.user.id != author.id and user.is_authenticated %}
+{% block musthead %}
+<div class="site-heading">
+    <span class="subheading">
+        <h3>Все посты пользователя: {{ author.get_full_name }}</h3>
+        <h3>Всего постов: {{ author.posts.count }} </h3> 
+        <h4> Подписок: {{ author.follower.count }} </h4>
+        <h4> Подписчиков: {{ author.following.count }} </h4>
+            {% if request.user.id != author.id and user.is_authenticated %}
             {% if following %}
             <a
             class="btn btn-lg btn-light"
@@ -28,15 +28,21 @@
             </a>
         {% endif %}
    {% endif %}
+    </span>
 </div>
-{% endblock header %}
+{% endblock %}
 
 {% block content %}
-    {% for post in page_obj %}
-        {% include 'posts/includes/post_card.html'%}
-        {% if not forloop.last %}<hr>{% endif %}
-    {% endfor %}
-
-    {% include 'posts/includes/paginator.html' %} 
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">  
+            {% for post in page_obj %}
+            {% include 'posts/includes/post_card.html'%}
+            {% if not forloop.last %}<hr>{% endif %}
+            {% endfor %}
+            {% include 'posts/includes/paginator.html' %} 
+        </div>  
+    </div>  
+</div>  
 
 {% endblock content %}

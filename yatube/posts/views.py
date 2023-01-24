@@ -18,6 +18,7 @@ def index(request):
     context = {
         'page_obj': page_obj,
     }
+    cache.clear()
 
     return render(request, template, context)
 
@@ -32,6 +33,7 @@ def group_posts(request, slug):
         'group': group,
         'page_obj': page_obj,
     }
+    cache.clear()
 
     return render(request, template, context)
 
@@ -51,6 +53,7 @@ def profile(request, username):
         'page_obj': page_obj,
         'following': following,
     }
+    cache.clear()
 
     return render(request, template, context)
 
@@ -133,6 +136,8 @@ def follow_index(request):
     context = {
         'page_obj': page_obj,
     }
+    cache.clear()
+
     return render(request, template, context)
 
 

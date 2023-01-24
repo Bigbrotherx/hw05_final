@@ -1,30 +1,38 @@
-{% extends 'base.html' %}
+{% extends 'musthead.html' %}
 {% load cache %}
 
 {% block title %}
     Последние обновления на сайте
 {% endblock title %}
 
-{% block header %}   
-        <h1>Главная страница проекта</h1>
-{% endblock header %}
+{% block musthead %}
+  <div class="site-heading">
+    <h1>Блогъ</h1>
+    <span class="subheading">
+      {% with index=True %}
+        {% include 'posts/includes/switcher.html' %}
+      {% endwith %}
+    </span>
+  </div>
+{% endblock %}
+
 
 {% block content %}
+<div class="container px-4 px-lg-5">
+  <div class="row gx-4 gx-lg-5 justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">  
+      {% cache 20 index_page %}
+        {% for post in page_obj %}
 
-  {% with index=True %}
-    {% include 'posts/includes/switcher.html' %}
-  {% endwith %}
+          {% include 'posts/includes/post_card.html'%}
+          {% if not forloop.last %}<hr class="my-4" />{% endif %}
+          
+        {% endfor %}
 
-  {% cache 20 index_page %}
-    {% for post in page_obj %}
+      {% endcache %}
 
-      {% include 'posts/includes/post_card.html'%}
-      {% if not forloop.last %}<hr>{% endif %}
-      
-    {% endfor %}
-
-  {% endcache %}
-
-  {% include 'posts/includes/paginator.html' %}
-
+      {% include 'posts/includes/paginator.html' %}
+    </div>  
+  </div>  
+</div>  
 {% endblock content %}

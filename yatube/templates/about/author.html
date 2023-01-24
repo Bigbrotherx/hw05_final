@@ -1,8 +1,21 @@
-{% extends "base.html" %}
+{% extends 'musthead.html' %}
+
 {% block title %}Об авторе проекта{% endblock %}
+
+{% block musthead %}
+
+<div class="site-heading">
+    <h1>Обо мне</h1>
+    <span class="subheading">
+    И о том, что меня вдохновляет
+    </span>
+</div>
+
+{% endblock %}
+
 {% load static %}
 {% block content %}
-<div class="row row-cols-1 row-cols-md-3">
+    <div class="row row-cols-1 row-cols-md-3">
     <div class="card text-black bg-light mb-3" style="max-width: 540px;">
         <div class="row no-gutters">
             <div class="col-md-6">
@@ -47,7 +60,6 @@
         </div>
     </div>
 </div>
-
 <div class="card text-center bg-light">
     <div class="card-body">
         <h5 class="card-title">Обратная связь</h5>

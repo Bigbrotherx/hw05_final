@@ -2,7 +2,12 @@
 <html lang="ru"> 
   <head>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"> 
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" /> 
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+    
     <meta charset="utf-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="{% static 'img/fav/favico.ico' %}" type="image">
@@ -11,7 +16,6 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/fav/favicon-16x16.png' %}">
     <meta name="msapplication-TileColor" content="#000">
     <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <title>
       {% block title %}
       <!-- Здесь будет заголовок страницы -->
@@ -20,19 +24,21 @@
   </head>
   <body>
     <header>
+      {% block header %}   
+      <!-- Здесь будет заголовок содержания страницы -->
+      {% endblock header %}
+
       {% include 'includes/header.html' %}
     </header>
     <main> 
-      <div class="container py-5">  
-        {% block header %}   
-        <!-- Здесь будет заголовок содержания страницы -->
-        {% endblock header %}
-
-        {% block content %}
-        <!-- Основное наполнение страницы --> 
-        {% endblock content %}
-      </div>  
+      {% block content %}
+      <!-- Основное наполнение страницы --> 
+      {% endblock content %}
     </main>        
       {% include 'includes/footer.html' %}   
+   <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="{% static 'js/scripts.js' %}"></script>
   </body>
 </html>
